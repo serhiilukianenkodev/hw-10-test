@@ -1,22 +1,18 @@
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+
 const loaderEl = document.querySelector('.loader');
-const errorEl = document.querySelector('.error');
+// const errorEl = document.querySelector('.error');
 
 export function showLoader() {
-  // loaderEl.hidden = false;
   loaderEl.style.display = '';
-  errorEl.hidden = true;
+  //   errorEl.hidden = true;
 }
 
 export function hideLoader() {
-  //   loaderEl.hidden = true;
-  //   console.dir(loaderEl);
   loaderEl.style.display = 'none';
 }
 
 export function showError() {
-  errorEl.hidden = false;
+  Notify.failure(' Oops! Something went wrong! Try reloading the page!');
+  //   errorEl.hidden = false;
 }
-
-// export function hideError() {
-//   errorEl.hidden = true;
-// }

@@ -1,13 +1,26 @@
-import { fetchBreeds, fetchCatByBreed, fetchCatImg } from './cat-api';
-// 'x-api-key'
-// 'live_6LtOq60s5fIHrbRM9r9IrxeJXsqT0vsnfIjhAkCuuyVXXChXSV2blRkKHS5PpFki'
-// 'api_key=live_6LtOq60s5fIHrbRM9r9IrxeJXsqT0vsnfIjhAkCuuyVXXChXSV2blRkKHS5PpFki'
+import SlimSelect from 'slim-select';
+
+import './css/loader.css';
+
+import { fetchBreeds, fetchCatByBreed, fetchCatImg } from './js/cat-api';
+import { showError, hideLoader } from './js/helpers';
 
 const breedInfoEl = document.querySelector('.cat-info');
-fetchBreeds().then(showBreeds).catch(console.log);
-
 const selectEl = document.querySelector('.breed-select');
-selectEl.addEventListener('input', onSelect);
+
+// new SlimSelect({
+//   select: selectEl,
+// });
+
+fetchBreeds()
+  .then(showBreeds)
+  .catch(showError)
+  .finally(() => {
+    hideLoader();
+    selectEl.hidden = false;
+  });
+
+// selectEl.addEventListener('input', onSelect);
 
 function showBreeds(breeds) {
   const selectMarkup = breeds
@@ -15,19 +28,24 @@ function showBreeds(breeds) {
     .join('');
 
   selectEl.innerHTML = selectMarkup;
+  new SlimSelect({
+    select: selectEl,
+    events: {
+      afterChange: onSelect,
+    },
+  });
 }
 
-function onSelect(evt) {
-  const searchId = evt.target.value;
+function onSelect(query) {
+  const searchId = query[0].value;
 
   fetchCatByBreed(searchId)
     .then(breed => showBreed(breed[0].breeds[0]))
-    .catch(console.log);
+    .catch(showError)
+    .finally(hideLoader);
 }
 
-// появляется изображение и развернутая информация о коте: название породы, описание и темперамент.
 function showBreed(breed) {
-  console.log(breed);
   const name = breed.name;
   const temperament = breed.temperament;
   const desc = breed.description;
@@ -42,5 +60,9 @@ function showBreed(breed) {
 
       breedInfoEl.innerHTML = markup;
     })
-    .catch(console.log);
+    .catch(showError)
+    .finally(() => {
+      hideLoader();
+      breedInfoEl.hidden = false;
+    });
 }
